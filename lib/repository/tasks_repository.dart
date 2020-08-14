@@ -24,6 +24,11 @@ class TaskRepository {
     return _firestore.collection(tasks).snapshots();
   }
 
+  /// Get task once per request
+  Future<QuerySnapshot> getTasksAsync() async {
+    return _firestore.collection(tasks).getDocuments();
+  }
+
   /// Get task by the by its id that match the document id in the db
   Future<DocumentSnapshot> getTaskById(String taskId) {
     return _firestore.collection(tasks).document(taskId).get();

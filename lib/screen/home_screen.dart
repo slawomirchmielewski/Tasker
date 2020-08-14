@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tasker/bloc/task_bloc/task_bloc.dart';
 import 'package:tasker/config/router.dart';
+import 'package:tasker/model/task.dart';
 import 'package:tasker/view/tasks_list_view.dart';
-import 'package:tasker/widget/error_message.dart';
 
 ///
 /// Screen to represent main content of the application
@@ -28,27 +28,87 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text("Tasks"),
         automaticallyImplyLeading: false,
       ),
-      body: BlocBuilder<TaskBloc, TaskState>(builder: (context, state) {
-        if (state is TaskStateLoading) {
+      body: BlocBuilder<TaskBloc, List<Task>>(builder: (context, tasks) {
+        if (tasks == null) {
           return Center(child: CircularProgressIndicator());
         }
 
-        if (state is TaskStateLoaded) {
-          return TasksListView(tasks: state.tasks);
-        }
-        if (state is TaskStateError) {
-          return ErrorMessage();
-        }
-
-        return Container();
+        return TasksListView(tasks: tasks);
       }),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton.extended(
-        label: Text("New Task"),
-        icon: Icon(Icons.add),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
         onPressed: () {
           Navigator.of(context).pushNamed(Router.NEW_TASK_SCREEN);
         },
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          children: [
+            IconButton(
+              icon: Icon(Icons.menu),
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) => Container(
+                    child: SafeArea(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ListTile(
+                            title: Text("Tasks",
+                                style: TextStyle()
+                                    .copyWith(fontWeight: FontWeight.bold)),
+                          ),
+                          ListTile(
+                            title: Text("Show completed tasks"),
+                            leading: Icon(Icons.visibility),
+                            onTap: () {
+                              context
+                                  .bloc<TaskBloc>()
+                                  .add(TaskEventShowCompleted());
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          ListTile(
+                            title: Text("Hide completed tasks"),
+                            leading: Icon(Icons.visibility_off),
+                            onTap: () {
+                              context
+                                  .bloc<TaskBloc>()
+                                  .add(TaskEventHideCompleted());
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          ListTile(
+                            title: Text("Sort ascending"),
+                            leading: Icon(Icons.sort_by_alpha),
+                            onTap: () {
+                              context
+                                  .bloc<TaskBloc>()
+                                  .add(TaskEventSortAscending());
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          ListTile(
+                            title: Text("Sort descending"),
+                            leading: Icon(Icons.sort_by_alpha),
+                            onTap: () {
+                              context
+                                  .bloc<TaskBloc>()
+                                  .add(TaskEventSortDescending());
+                              Navigator.of(context).pop();
+                            },
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            )
+          ],
+        ),
       ),
     );
   }

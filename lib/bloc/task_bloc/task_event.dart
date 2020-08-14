@@ -10,6 +10,14 @@ abstract class TaskEvent extends Equatable {
 
 class TaskEventGetTasks extends TaskEvent {}
 
+class TaskEventSortAscending extends TaskEvent {}
+
+class TaskEventSortDescending extends TaskEvent {}
+
+class TaskEventHideCompleted extends TaskEvent {}
+
+class TaskEventShowCompleted extends TaskEvent {}
+
 class TaskEventUpdateStream extends TaskEvent {
   final List<Task> tasks;
 
@@ -46,6 +54,5 @@ class TaskEventChangeSubTaskState extends TaskEvent {
   TaskEventChangeSubTaskState({this.task, this.subtask, this.index});
 
   @override
-  // TODO: implement props
   List<Object> get props => [task, subtask, index];
 }
